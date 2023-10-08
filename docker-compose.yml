@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  php:
+    build:
+      context: ./infra/php
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/var/www/html
+      - ./infra/php/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - 8080:80
+    depends_on:
+    - mysql
+  mysql:
+    build:
+      context: ./infra/mysql
+      dockerfile: Dockerfile
+    volumes:
+      - ./infra/mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - TZ=Asia/Tokyo
+  phpmyadmin:
+    build:
+      context: ./infra/phpmyadmin
+      dockerfile: Dockerfile
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    ports:
+      - 4040:80
+    volumes:
+      - ./infra/phpmyadmin/sessions:/sessions
